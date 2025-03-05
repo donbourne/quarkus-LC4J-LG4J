@@ -78,23 +78,6 @@ public class LangGraphFlowA3 {
             }
         };
 
-        final EdgeAction<AgentState> researcherConditionalEdge = new EdgeAction<>() {
-            @Override
-            public String apply(AgentState state) {
-                String research_bullets = (String)state.value("research_bullets").orElse("");
-                if (research_bullets.contains("getFacts")) {
-                    // tool call was expected but didn't happen
-                    System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-                    System.out.println("tool call expected but didn't occur. retrying.");
-                    System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-                    return "redo";
-                }
-                else {
-                    return "done";
-                }
-            }
-        };
-
         var workflow = new StateGraph<>(AgentState::new)
                 .addNode("researcher", node_async((state) -> {
                     System.out.println("---------- RESEARCHER ----------");
@@ -103,15 +86,20 @@ public class LangGraphFlowA3 {
                     // System.out.println("topic: " + topic);
 
                     String previous_research_bullets = (String)state.value("research_bullets").orElse("");
-                    // System.out.println("previous research: " + previous_research_bullets);
+                    System.out.println("previous research: " + previous_research_bullets);
                     
                     String review_comments = (String)state.value("review_comments").orElse("");
                     review_comments = getLinesWithPrefix(review_comments, "RESEARCHER", "");
                     // System.out.println("review_comments: " + review_comments);
                     
-                    String new_research_bullets = useLLM ? researcherAIService.doResearch(topic, previous_research_bullets, review_comments) 
+                    String new_research_bullets = null;
+
+                    do {
+                        new_research_bullets = useLLM ? researcherAIService.doResearch(topic, previous_research_bullets, review_comments) 
                     : "no research";
-                    System.out.println("research_bullets: " + new_research_bullets);
+                        System.out.println("research_bullets: " + new_research_bullets);
+                    }
+                    while (new_research_bullets.contains("getFacts"));      // tool call expected but didn't occur.
 
                     return Map.of("research_bullets", new_research_bullets);
                 }))
@@ -169,12 +157,10 @@ public class LangGraphFlowA3 {
                     return Map.of("formatted_article", formatted_article);
                 }))
                 .addEdge(START, "researcher")
+                .addEdge("researcher", "author")
                 .addEdge("author", "reviewer")
                 .addEdge("formatter", END)
-                .addConditionalEdges("reviewer", edge_async(reviewerConditionalEdge), Map.of("author", "author", "researcher", "researcher", "formatter", "formatter"))
-                .addConditionalEdges("researcher", edge_async(researcherConditionalEdge), Map.of("redo", "researcher", "done", "author"));
-                
-
+                .addConditionalEdges("reviewer", edge_async(reviewerConditionalEdge), Map.of("author", "author", "researcher", "researcher", "formatter", "formatter"));
 
         return  LangGraphFlow.builder()
                 .title("LangGraph A3 Example")
