@@ -86,7 +86,7 @@ public class LangGraphFlowA3 {
                     // System.out.println("topic: " + topic);
 
                     String previous_research_bullets = (String)state.value("research_bullets").orElse("");
-                    System.out.println("previous research: " + previous_research_bullets);
+                    // System.out.println("previous research: " + previous_research_bullets);
                     
                     String review_comments = (String)state.value("review_comments").orElse("");
                     review_comments = getLinesWithPrefix(review_comments, "RESEARCHER", "");
