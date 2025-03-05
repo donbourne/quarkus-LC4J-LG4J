@@ -7,7 +7,7 @@ This is a prototype showing how to use LangGraph4J as the agent orchestrator for
 - Reviewer - to evaluate if the blog needs more research or editing
 - Formatter - to format the blog
 
-![image](https://github.ibm.com/maui/exploration/assets/7766/f49231be-8d55-47dc-a6de-0b105938154d)
+![image](https://github.com/user-attachments/assets/89610be8-0b77-44d9-ad1e-dd53ed6f1478)
 
 ### Build and Run in Dev Mode
 ```
@@ -21,5 +21,5 @@ http://localhost:8080/research2/<topic+for+a+blog>
 ### Example Output
 http://localhost:8080/research2/impact%20of%20social%20media%20on%20elections
 
-<img width="1727" alt="image" src="https://github.ibm.com/maui/exploration/assets/7766/98eb39a4-3099-48cf-830c-25fc02aeac60">
+![image](https://github.com/user-attachments/assets/2e80e21f-b9af-450a-9337-f2bc21cb8641)
 
